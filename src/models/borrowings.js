@@ -22,11 +22,13 @@ const borrowingSchema = new mongoose.Schema(
       required: true,
       validate: {
         validator: function (value) {
-          // Pastikan tanggal pengembalian lebih besar dari tanggal peminjaman
           return value > this.borrowDate;
         },
         message: 'Return date must be after borrow date',
       },
+    },
+    dayDate: {
+      type: Date,
     },
     status: {
       type: String,

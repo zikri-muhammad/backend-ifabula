@@ -11,6 +11,10 @@ export const getBorrowing = catchAsyncErrors(async (req, res, next) => {
     .limitFields()
     .searchByQuery()
     .pagination();
+  
+  apiFilters.query = apiFilters.query
+    .populate('user')
+    .populate('book');
 
   const borrowing = await apiFilters.query;
 
@@ -23,14 +27,21 @@ export const getBorrowing = catchAsyncErrors(async (req, res, next) => {
 
 // Create borrowings   =>   /api/v1/borrowings
 export const createBorrowing = catchAsyncErrors(async (req, res, next) => {
-  
+  // Periksa apakah pengguna sudah meminjam buku
+  const existingBorrowing = await Borrowing.findOne({ user: req.user.id,dayDate: { $exists: true } });
+
+  if (existingBorrowing) {
+    return next(new ErrorHandler('User already has an active borrowing. Please return the book first.', 400));
+  }
+
+  // Buat peminjaman baru
   req.body.user = req.user.id;
   const borrowing = await Borrowing.create(req.body);
 
   res.status(200).json({
     success: true,
     message: 'Borrowing Created.',
-    data: borrowing
+    data: borrowing,
   });
 });
 
@@ -48,7 +59,7 @@ export const getBorrowingById = catchAsyncErrors(async (req, res, next) => {
   });
 });
 
-// Update a book  =>  /api/v1/book/:id
+// Update a borrowing  =>  /api/v1/borrowing/:id
 export const updateBorrowing = catchAsyncErrors(async (req, res, next) => {
   let borrowing = await Borrowing.findById(req.params.id);
 
@@ -85,3 +96,30 @@ export const deleteBorrowing = catchAsyncErrors(async (req, res, next) => {
   });
 
 })
+
+// return borrowing   =>  /api/v1/return-borrowing/:id
+export const returnBorrowing = catchAsyncErrors(async (req, res, next) => {
+  try {
+    const borrowing = await Borrowing.findById(req.params.id);
+    if (!borrowing) {
+      return next(new ErrorHandler('Borrowing not found', 404));
+    }
+
+    if (borrowing.returnDate > Date.now()) {
+      borrowing.status = 'On Time';
+      borrowing.dayDate = new Date();
+    } else {
+      borrowing.status = 'Late';
+    }
+    await borrowing.save();
+
+    res.status(200).json({
+      success: true,
+      message: 'Book returned successfully.',
+    });
+  } catch (error) {
+    console.error(error);
+    next(new ErrorHandler('Failed to return the book', 500));
+  }
+});
+
