@@ -7,9 +7,9 @@ import {
 
 import { isAuthenticatedUser, authorizeRoles } from '../middlewares/auth.js';
 
-router.use(isAuthenticatedUser, authorizeRoles('admin'));
+router.use(isAuthenticatedUser);
 
 router.route('/me').get(getUserProfile);
-router.route('/users').get(getUsers);
+router.route('/users').get(authorizeRoles('admin'), getUsers);
 
 export default router;
