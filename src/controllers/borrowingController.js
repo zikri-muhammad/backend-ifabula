@@ -123,3 +123,21 @@ export const returnBorrowing = catchAsyncErrors(async (req, res, next) => {
   }
 });
 
+
+// Get a single borrowing by users    =>  /api/v1/borrowing-users
+export const getBorrowingByUser = catchAsyncErrors(async (req, res, next) => {
+  // console.log(req.user.id)
+  const userId = req.user.id;
+  const borrowing = await Borrowing.find({ user: userId })
+  .populate('user')
+  .populate('book');
+
+  if (!borrowing || borrowing.length === 0) {
+    return next(new ErrorHandler('Borrowing not found', 404));
+  }
+
+  res.status(200).json({
+    success: true,
+    data: borrowing
+  });
+});
