@@ -4,6 +4,7 @@ import connectDatabase from './config/database.js';
 import errorMiddleware from './src/middlewares/errors.js';
 import ErrorHandler from './src/utils/errorHandler.js';
 import cookieParser from 'cookie-parser';
+import cors from 'cors';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -26,6 +27,9 @@ app.use(express.json())
 
 // Set cookie parser
 app.use(cookieParser());
+
+// Setup CORS - Accessible by other domains
+app.use(cors());
 
 // import all routes
 import authRoute from "./src/routes/authRoute.js";
