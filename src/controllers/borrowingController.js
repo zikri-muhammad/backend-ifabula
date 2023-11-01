@@ -28,7 +28,7 @@ export const getBorrowing = catchAsyncErrors(async (req, res, next) => {
 // Create borrowings   =>   /api/v1/borrowings
 export const createBorrowing = catchAsyncErrors(async (req, res, next) => {
   // Periksa apakah pengguna sudah meminjam buku
-  const existingBorrowing = await Borrowing.findOne({ user: req.user.id,dayDate: { $exists: true } });
+  const existingBorrowing = await Borrowing.findOne({ user: req.user.id,dayDate: { $exists: false } });
 
   if (existingBorrowing) {
     return next(new ErrorHandler('User already has an active borrowing. Please return the book first.', 400));
