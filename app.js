@@ -30,10 +30,14 @@ app.use(cookieParser());
 // import all routes
 import authRoute from "./src/routes/authRoute.js";
 import userRoute from "./src/routes/userRoute.js";
+import bookRoute from "./src/routes/bookRoute.js";
+import borrowingRoute from "./src/routes/borrowingRoute.js";
 
 // console.log(routerJob)
 app.use('/api/v1', authRoute)
 app.use('/api/v1', userRoute)
+app.use('/api/v1', bookRoute)
+app.use('/api/v1', borrowingRoute)
 
 // Handle unhandled routes
 app.all('*', (req, res, next) => {
