@@ -67,9 +67,14 @@ export const updateBorrowing = catchAsyncErrors(async (req, res, next) => {
     return next(new ErrorHandler('borrowing not found', 404));
   }
 
+  if (req.body.returnDate && req.body.returnDate <= borrowing.borrowDate.toISOString()) {
+    return next(new ErrorHandler('Return date must be after borrow date', 400));
+  }
+
+
   borrowing = await Borrowing.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
-    runValidators: true,
+    // runValidators: true,
     useFindAndModify: false
   });
 

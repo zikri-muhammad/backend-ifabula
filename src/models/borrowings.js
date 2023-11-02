@@ -22,7 +22,10 @@ const borrowingSchema = new mongoose.Schema(
       required: true,
       validate: {
         validator: function (value) {
-          return value > this.borrowDate;
+          const returnDate = new Date(value);
+          const borrowDate = new Date(this.borrowDate);
+
+          return returnDate > borrowDate;
         },
         message: 'Return date must be after borrow date',
       },
